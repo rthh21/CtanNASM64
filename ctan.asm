@@ -5,9 +5,11 @@ section .data
     sinres        resq 1
     cosres        resq 1
     ctanres       resq 1
-    mes           db "Rezultat: %lf",10,0
-    mes_in        db "Unghi in grade: ",10,0  
-    scanformat    db "%lf", 0
+    mes_sin       db "sin: %lf",10,0
+    mes_cos       db "cos: %lf",10,0
+    mes_ctan     db "Rezultat: %lf",10,0
+    mes_in        db "Unghi in grade: ",0  
+    scanformat    db "%lf",0
     
 section .text
     global main
@@ -32,28 +34,38 @@ main:
     
     ; Transformam grade -> radiani
     movsd xmm0, [x]
-    movsd xmm1, [factor]
+    movsd xmm1, qword [factor]
     mulsd xmm0, xmm1
-    movsd [radians], xmm0
+    movsd qword [radians], xmm0
     
     ; sin
-    movsd xmm0, [radians]
+    movsd xmm0, qword [radians]
     call sin
     movsd [sinres], xmm0
     
     ; cos
-    movsd xmm0, [radians]
+    movsd xmm0, qword [radians]
     call cos
-    movsd [cosres], xmm0
+    movsd qword [cosres], xmm0
     
     ; ctan = cos/sin
-    movsd xmm0, [cosres]      
-    divsd xmm0, [sinres] 
-    movsd [ctanres], xmm0
+    movsd xmm0, qword [cosres]      
+    divsd xmm0, qword [sinres] 
+    movsd qword [ctanres], xmm0
     
     ; afisam rez
-    mov rdi, mes
-    movsd xmm0, [ctanres]
+    mov rdi, mes_sin
+    movsd xmm0, qword [sinres]    ; Display sin result
+    mov rax, 1 
+    call printf
+
+    mov rdi, mes_cos
+    movsd xmm0, qword [cosres]    ; Display cos result
+    mov rax, 1 
+    call printf
+
+    mov rdi, mes_ctan
+    movsd xmm0, qword [ctanres]   ; Display cotangent result
     mov rax, 1 
     call printf
     
